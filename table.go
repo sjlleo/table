@@ -37,7 +37,7 @@ import (
 // and can be modified.
 var (
 	// DefaultPadding specifies the number of spaces between columns in a table.
-	DefaultPadding = 2
+	DefaultPadding = 6
 
 	// DefaultWriter specifies the output io.Writer for the Table.Print method.
 	DefaultWriter io.Writer = os.Stdout

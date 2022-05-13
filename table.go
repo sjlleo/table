@@ -134,6 +134,7 @@ func New(columnHeaders ...interface{}) Table {
 	t := table{header: make([]string, len(columnHeaders))}
 
 	t.WithPadding(DefaultPadding)
+	t.WithIndex(0)
 	t.WithWriter(DefaultWriter)
 	t.WithHeaderFormatter(DefaultHeaderFormatter)
 	t.WithFirstColumnFormatter(DefaultFirstColumnFormatter)
@@ -150,6 +151,7 @@ type table struct {
 	FirstColumnFormatter Formatter
 	HeaderFormatter      Formatter
 	Padding              int
+	Index                int
 	Writer               io.Writer
 	Width                WidthFunc
 
@@ -174,6 +176,15 @@ func (t *table) WithPadding(p int) Table {
 	}
 
 	t.Padding = p
+	return t
+}
+
+func (t *table) WithIndex(i int) Table {
+	if i < 0 {
+		i = 0
+	}
+
+	t.Padding = i
 	return t
 }
 
@@ -220,13 +231,17 @@ func (t *table) SetRows(rows [][]string) Table {
 }
 
 func (t *table) Print() {
+
 	format := strings.Repeat("%s", len(t.header)) + "\n"
 	t.calculateWidths()
-
-	t.printHeader(format)
-	for _, row := range t.rows {
-		t.printRow(format, row)
+	if t.Index == 0 {
+		// 第一次打印，应该打印表头
+		t.printHeader(format)
 	}
+	// 根据索引进行打印
+	t.printRow(format, t.rows[t.Index])
+	// 索引 + 1
+	t.Index += 1
 }
 
 func (t *table) printHeader(format string) {
